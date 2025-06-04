@@ -1,6 +1,10 @@
 name: Build and Upload Artifact
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'  # This triggers the workflow when a tag like v1.0.0 is pushed
 
 jobs:
   build:
@@ -15,9 +19,17 @@ jobs:
           mkdir output
           echo "This is a sample artifact file" > output/hello.txt
 
-      - name: Upload Artifact
+      - name: Upload Artifact to Actions
         uses: actions/upload-artifact@v4
         with:
           name: my-artifact
           path: output/
           retention-days: 14
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: output/hello.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
